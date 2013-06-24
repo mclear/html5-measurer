@@ -1,79 +1,34 @@
 <!DOCTYPE html>
-<html>
+<head>
+<title>Ring measurement using your webcam</title>
+<script src="fabric.js"></script>
+</head>
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Html5-measurer : Use your webcam and a credit card to measure the size of an object, in this example, a ring finger." />
+<body style="margin:0;padding:0;font-family:Arial">
+  <div id="container" style="position:relative;max-width:800px;text-align:center;margin:0;padding:0;">
+    <video autoplay width=800 style="position:absolute;top:0;left:0"></video>
+    <canvas id="canvas" style="position:absolute;top:0;left:0;z-index:6" width=800 height=600></canvas><br/>
+    <canvas id="canvas2" style="position:absolute;top:0;left:0;z-index:1" width=800 height=600></canvas><br/>
+	<div id="instructions" style="font-size:40px;position:absolute;top:0;left:10px;display:none;z-index:5;-webkit-text-stroke: 1px black;color: white;text-shadow:3px 3px 0 #000,-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">	  Hold a Credit card with the magnetic strip showing in the box and hit the Get Started button, you will have 10 seconds to get into position.  For best results try keep your palm as parallel to the lens of your webcam as possible.	</div>
+	<div id="timer" style="font-size:160px;position:absolute;top:0;left:10px;display:none;z-index:5;-webkit-text-stroke: 1px black;color: white;text-shadow:3px 3px 0 #000,-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;" ></div>
+	<div id="msi" style="font-size:40px;position:absolute;top:0;left:10px;display:none;z-index:5;-webkit-text-stroke: 1px black;color: white;text-shadow:3px 3px 0 #000,-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">Put the white box over the card magnetic strip resizing it to fit</div>
+    <div id="fsi" style="font-size:40px;position:absolute;top:0;left:10px;display:none;z-index:5;-webkit-text-stroke: 1px black;color: white;text-shadow:3px 3px 0 #000,-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">Put the blue box over the ring finger resizing it to fit</div>
+  	<button id="msn" style="font-size:40px;position:absolute;top:530px;right:10px;display:none;z-index:7;" >Next</button>
+	<button id="finish" style="font-size:40px;position:absolute;top:530px;right:10px;display:none;z-index:7;" >Finish</button>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Html5-measurer</title>
-  </head>
-
-  <body>
-
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/mclear/html5-measurer">View on GitHub</a>
-
-          <h1 id="project_title">Html5-measurer</h1>
-          <h2 id="project_tagline">Use your webcam and a credit card to measure the size of an object, in this example, a ring finger.</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/mclear/html5-measurer/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/mclear/html5-measurer/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+    <div id="guide" style="position:absolute;top:35px;left:0;display:none;z-index:5;width:100%;text-align:center" ><img src="guide.png"></div>
+	<button id="go" style="z-index:8;position:absolute;top:500px;font-size:80px;display:none;width:100%;">Get started</button>
+    <div id="prompt" style="text-align:center;font-size:80px;position:absolute;top:50px;width:100%;">Click "Allow" above</div>
+    <div id="finished" style="display:none;font-size:40px;position:absolute;top:0;left:10px;display:none;z-index:5;-webkit-text-stroke: 1px black;color: white;text-shadow:3px 3px 0 #000,-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">
+	  Congratulations!
+	</div>
+	<div id="sizes" style="font-size:40px;position:absolute;top:100px;left:0px;width:100%;display:none;z-index:5;-webkit-text-stroke: 1px black;color: white;text-shadow:3px 3px 0 #000,-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">
+	  Finger Diameter Size: 
+	  <div id="finger" style="font-size:80px;display:none;z-index:5;position:absolute;top:150px;left:0px;width:100%;-webkit-text-stroke: 1px black;color: white;text-shadow:3px 3px 0 #000,-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"></div>
     </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Html5-measurer maintained by <a href="https://github.com/mclear">mclear</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
-  </body>
+	<button id="reset" onClick="location.reload()" style="font-size:40px;position:absolute;top:530px;right:10px;display:none;z-index:7;">Start Again</div>
+	
+  </div>
+  <script src="fingers.js"></script>
+</body>
 </html>
