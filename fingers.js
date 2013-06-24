@@ -8,7 +8,7 @@ var canvas = new fabric.Canvas('canvas'); // the main canvas element that can be
 var video = document.querySelector('video'); // the video input source
 var canvas2 = $('canvas2').getContext('2d'); // the canvas element that will contain the video captured
 var stripWidth = 170; // The magnetic strip width
-var count=1; // The countdown duration in seconds -- note the extra second for kids..
+var count=6; // The countdown duration in seconds -- note the extra second for kids..
 var counter; // The actual timer.
 
 localMediaStream = null;
