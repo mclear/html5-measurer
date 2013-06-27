@@ -8,7 +8,7 @@ var canvas = new fabric.Canvas('canvas'); // the main canvas element that can be
 var video = document.querySelector('video'); // the video input source
 var canvas2 = $('canvas2').getContext('2d'); // the canvas element that will contain the video captured
 var stripWidth = 170; // The magnetic strip width
-var count=6; // The countdown duration in seconds -- note the extra second for kids..
+var count=1; // The countdown duration in seconds -- note the extra second for kids..
 var counter; // The actual timer.
 
 localMediaStream = null;
@@ -36,15 +36,24 @@ var finger = new fabric.Rect({
   fill: 'rgba(0,0,255,0.5)'
 });
 
+
+
 strip.on('modified', function(options) {
   stripWidth = strip.getWidth(); // get teh new width
-  console.log('new Width', stripWidth);
-  document.getElementById('finger').innerHTML=scaleToRingSize(finger.getWidth());
 });
 
 finger.on('modified', function(options) {
-  document.getElementById('finger').innerHTML=scaleToRingSize(finger.getWidth()) + "mm";
+  measure();
 });
+
+function measure(){
+  var ringSize = scaleToRingSize(finger.getWidth()); // gets ring size in mm
+  var ringSizeLegacy = new ringSizeFromMM(ringSize); // gets the ring Size in legacy broken industry form IE 9, object returned.
+  console.log("ringSizeLegacy", ringSizeLegacy);
+  document.getElementById('fingerMM').innerHTML = scaleToRingSize(ringSize) + "mm";
+  if(ringSizeLegacy.eu) document.getElementById('fingerEU').innerHTML = ringSizeLegacy.eu + "EU";
+  document.getElementById('fingerUS').innerHTML = ringSizeLegacy.us + "US";
+}
 
 function snapshot() {
   
@@ -59,6 +68,7 @@ function snapshot() {
 
     canvas2.drawImage(video, 0, 0, 800, 600); // draw the captured content onto a canvas
 	canvas.add(strip); // add the strip rectangle to the edit canvas
+    stripWidth = strip.getWidth(); // get teh new width
 	$('msn').style.display = "block"; // show the instruction to resize mag strip
 	
   }
@@ -66,6 +76,7 @@ function snapshot() {
 
 // Takes a scale value and tries to figure out the mm diameter of each ring
 function scaleToRingSize(widthPx){
+  console.log(widthPx, stripWidth);
   // console.log(widthPx);
   return (85.72500 / stripWidth * widthPx).toFixed(2);;
 }
@@ -104,7 +115,9 @@ function showFinished(){
   $('sizes').style.display = "block";
   $('fsi').style.display = "none";
   $('finish').style.display = "none";
-  $('finger').style.display = "block";
+  $('fingerMM').style.display = "block";
+  $('fingerEU').style.display = "block";
+  $('fingerUS').style.display = "block";
   $('reset').style.display = "block";
 }
 
@@ -114,9 +127,9 @@ function showFinger(){
   $('msi').style.display = "none";
   $('fsi').style.display = "block";
   $('finish').style.display = "block";
-
   strip.remove();
   canvas.add(finger); // add the first finger to the edit canvas
+  measure();
 }
 
 function timer()
@@ -132,3 +145,24 @@ function timer()
     return;
   }
 }
+
+var ringSizeFromMM = function(size){
+
+  /* Below can be minified then ignored, it's just the ring sizes conversion chart from http://en.wikipedia.org/wiki/Ring_size -- Make for insane readin tho.. */
+  var sizes = [{11.63 : {us: 0 , eu: null}, 11.84 : {us: 0.25 , eu: null}, 12.04 : {us: 0.5 , eu: " A "}, 12.24 : {us: 0.75 , eu: " A and a half "}, 12.45 : {us: 1 , eu: " B "}, 12.65 : {us: 1.25 , eu: " B  and a half "}, 12.85 : {us: 1.5 , eu: " C "}, 13.06 : {us: 1.75 , eu: " C and a half "}, 13.26 : {us: 2 , eu: " D "}, 13.46 : {us: 2.25 , eu: " D and a half "}, 13.67 : {us: 2.5 , eu: " E "}, 13.87 : {us: 2.75 , eu: " E and a half "}, 14.07 : {us: 3 , eu: " F "}, 14.27 : {us: 3.25 , eu: " F and a half "}, 14.48 : {us: 3.5 , eu: " G "}, 14.68 : {us: 3.75 , eu: " G and a half "}, 14.88 : {us: 4 , eu: " H "}, 15.09 : {us: 4.25 , eu: " H and a half "}, 15.29 : {us: 4.5 , eu: " I "}, 15.49 : {us: 4.75 , eu: " J "}, 15.7 : {us: 5 , eu: " J and a half "}, 15.9 : {us: 5.25 , eu: " K "}, 16.1 : {us: 5.5 , eu: " K and a half "}, 16.31 : {us: 5.75 , eu: " L "}, 16.51 : {us: 6 , eu: " L and a half "}, 16.71 : {us: 6.25 , eu: " M "}, 16.92 : {us: 6.5 , eu: " M and a half "}, 17.12 : {us: 6.75 , eu: " N "}, 17.32 : {us: 7 , eu: " N and a half "}, 17.53 : {us: 7.25 , eu: " O "}, 17.73 : {us: 7.5 , eu: " O and a half "}, 17.93 : {us: 7.75 , eu: " P "}, 18.14 : {us: 8 , eu: " P and a half "}, 18.34 : {us: 8.25 , eu: " Q "}, 18.54 : {us: 8.5 , eu: " Q and a half "}, 18.75 : {us: 8.75 , eu: " R "}, 18.95 : {us: 9 , eu: " R and a half "}, 19.15 : {us: 9.25 , eu: " S "}, 19.35 : {us: 9.5 , eu: " S and a half "}, 19.56 : {us: 9.75 , eu: " T "}, 19.76 : {us: 10 , eu: " T and a half "}, 19.96 : {us: 10.25 , eu: " U "}, 20.17 : {us: 10.5 , eu: " U and a half "}, 20.37 : {us: 10.75 , eu: " V "}, 20.57 : {us: 11 , eu: " V and a half "}, 20.78 : {us: 11.25 , eu: " W "}, 20.98 : {us: 11.5 , eu: " W and a half "}, 21.18 : {us: 11.75 , eu: " X "}, 21.39 : {us: 12 , eu: " X and a half "}, 21.59 : {us: 12.25 , eu: " Y "}, 21.79 : {us: 12.5 , eu: " Z "}, 22 : {us: 12.75 , eu: null}, 22.2 : {us: 13 , eu: null}, 22.4 : {us: 13.25 , eu: null}, 22.61 : {us: 13.5 , eu: null}, 22.81 : {us: 13.75 , eu: null}, 23.01 : {us: 14 , eu: null}, 23.22 : {us: 14.25 , eu: null}, 23.42 : {us: 14.5 , eu: null}, 23.62 : {us: 14.75 , eu: null}, 23.83 : {us: 15 , eu: null}, 24.03 : {us: 15.25 , eu: null}, 24.23 : {us: 15.5 , eu: null}, 24.43 : {us: 15.75 , eu: null}, 24.64 : {us: 16 , eu: null}   }]  
+  /* End of conversions */
+  for(var i=0;i<sizes.length;i++){
+    var obj = sizes[i];
+    for(var key in obj){
+	// console.log(size, key); // size = the size of the ring we're looking for IE 13 -- Key = the available ring sizes in the conversion
+	  if(key >= size){ // is the size greater than what we want?
+	  console.log("obj", obj[key]);
+	    return obj[key]; // yay
+	  }
+    }
+  }
+  // alert("Invalid Ring Size");
+  // throw new Error("Invalid ring size");
+}
+
+
