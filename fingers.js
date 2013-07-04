@@ -1,17 +1,36 @@
-window.URL = window.URL || window.webkitURL;
-navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                          navigator.mozGetUserMedia || navigator.msGetUserMedia;
-
 var $ = function(id){return document.getElementById(id)}; // lazy dev is lazy
+var debug = gup("debug");
+var localMediaStream = null;
 
+if(debug){
+  // write image instead of using video
+  $('prompt').style.display = "none";
+  localMediaStream = true;
+  video = document.getElementById('debugImg');
+  video.src = "debugImg.png";
+  snapshot();
+}else{
+  window.URL = window.URL || window.webkitURL;
+  navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                          navigator.mozGetUserMedia || navigator.msGetUserMedia;
+  var video = document.querySelector('video'); // the video input source
+  // Start Video Stream
+  navigator.getUserMedia({video: true}, function(stream) {
+    video.src = window.URL.createObjectURL(stream);
+    localMediaStream = stream;
+    $('guide').style.display = "block";
+    $('go').style.display = "block";
+    $('prompt').style.display = "none";
+    // Draw shapes onto Canvas
+  }, function(){
+     alert("Enable and Allow your camera");
+  });
+}
 var canvas = new fabric.Canvas('canvas'); // the main canvas element that can be modified by resizing etc.
-var video = document.querySelector('video'); // the video input source
 var canvas2 = $('canvas2').getContext('2d'); // the canvas element that will contain the video captured
 var stripWidth = 170; // The magnetic strip width
 var count=6; // The countdown duration in seconds -- note the extra second for kids..
 var counter; // The actual timer.
-
-localMediaStream = null;
 
 // The magnetic strip rectangle.
 var strip = new fabric.Rect({
@@ -62,15 +81,14 @@ function snapshot() {
   if (localMediaStream) {
     video.style.display = "none";
     $('guide').style.display = "none";
-	$('go').style.display = "none";
+    $('go').style.display = "none";
     // $('sizes').style.display = "block";
-	$('msi').style.display = "block"; // show the instruction to resize mag strip
+    $('msi').style.display = "block"; // show the instruction to resize mag strip
 
     canvas2.drawImage(video, 0, 0, 800, 600); // draw the captured content onto a canvas
-	canvas.add(strip); // add the strip rectangle to the edit canvas
+    canvas.add(strip); // add the strip rectangle to the edit canvas
     stripWidth = strip.getWidth(); // get teh new width
-	$('msn').style.display = "block"; // show the instruction to resize mag strip
-	
+    $('msn').style.display = "block"; // show the instruction to resize mag strip
   }
 }
 
@@ -80,19 +98,6 @@ function scaleToRingSize(widthPx){
   // console.log(widthPx);
   return (85.72500 / stripWidth * widthPx).toFixed(2);;
 }
-
-// Start Video Stream
-navigator.getUserMedia({video: true}, function(stream) {
-  video.src = window.URL.createObjectURL(stream);
-  localMediaStream = stream;
-  $('guide').style.display = "block";
-  $('go').style.display = "block";
-  $('prompt').style.display = "none";
-
-  // Draw shapes onto Canvas
-}, function(){
-   alert("Enable and Allow your camera");
-});
 
 function countdown(){
   $('timer').style.display = "block"; // show countdown
@@ -161,3 +166,10 @@ var ringSizeFromMM = function(size){
 }
 
 
+function gup( name ){
+name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");  
+var regexS = "[\\?&]"+name+"=([^&#]*)";  
+var regex = new RegExp( regexS );  
+var results = regex.exec( window.location.href ); 
+ if( results == null )    return "";  
+else    return results[1];}
