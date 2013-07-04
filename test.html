@@ -1,14 +1,14 @@
 <html>
 <body>
 <img src="debugImg.png" id="debugImg">
-<canvas id="myCanvas"></canvas>
+<canvas id="myCanvas" height=200 width=200></canvas>
 
 <script type="text/javascript">
 var c=document.getElementById("myCanvas");
 var ctx=c.getContext("2d");
 var img=document.getElementById("debugImg");
 img.onmousemove = function zoom(e){
-  ctx.drawImage(img, e.x - 25 , e.y - 25 , 50,50, 0, 0, 100, 100 );
+  ctx.drawImage(img, e.x - 25 , e.y - 25 , 50,50, 0, 0, 200, 200 );
 }
 </script>
 
