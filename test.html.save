@@ -8,14 +8,14 @@ var c=document.getElementById("myCanvas");
 var ctx=c.getContext("2d");
 var img=document.getElementById("debugImg");
 img.onmousemove = function zoom(e){
-  ctx.drawImage(img, e.offsetX -25, e.offsetY -25, 50,50, 0, 0, 200, 200 );
-  // Stroked triangle
-  ctx.beginPath();
-  ctx.moveTo(100,50);
-  ctx.lineTo(100,150);
-  ctx.closePath();
-  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-  ctx.stroke();
+  ctx.drawImage(img, e.x - 25 , e.y - 25 , 50,50, 0, 0, 200, 200 );
+  var id = ctx.createImageData(1,1); // only do this once per page
+  var d  = id.data;                        // only do this once per page
+  d[0]   = 40;
+  d[1]   = 40;
+  d[2]   = 40;
+  d[3]   = 40;
+  ctx.putImageData( id, 125,125 );
 }
 </script>
 
