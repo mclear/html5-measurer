@@ -2,7 +2,7 @@ var $ = function(id){return document.getElementById(id)}; // lazy dev is lazy
 var debug = gup("debug");
 var localMediaStream = null;
 
-if(debug){
+if(debug){ // I haven't quite figured out how this will work yet..
   // write image instead of using video
   $('prompt').style.display = "none";
   localMediaStream = true;
@@ -29,7 +29,7 @@ if(debug){
 var canvas = new fabric.Canvas('canvas'); // the main canvas element that can be modified by resizing etc.
 var canvas2 = $('canvas2').getContext('2d'); // the canvas element that will contain the video captured
 var stripWidth = 170; // The magnetic strip width
-var count=6; // The countdown duration in seconds -- note the extra second for kids..
+var count=4; // The countdown duration in seconds -- note the extra second for kids..
 var counter; // The actual timer.
 
 // The magnetic strip rectangle.
@@ -54,8 +54,6 @@ var finger = new fabric.Rect({
   cornerSize: 5,
   fill: 'rgba(0,0,255,0.5)'
 });
-
-
 
 strip.on('modified', function(options) {
   stripWidth = strip.getWidth(); // get teh new width
@@ -84,11 +82,31 @@ function snapshot() {
     $('go').style.display = "none";
     // $('sizes').style.display = "block";
     $('msi').style.display = "block"; // show the instruction to resize mag strip
-
     canvas2.drawImage(video, 0, 0, 800, 600); // draw the captured content onto a canvas
-    canvas.add(strip); // add the strip rectangle to the edit canvas
-    stripWidth = strip.getWidth(); // get teh new width
+	var c = $('canvas2'); // get the canvas without context
+    var dataURL = c.toDataURL(); // get the data url of teh canvas
+    $('snapshot').src = dataURL; // write the data url to the image holder
+	canvas.add(strip); // add the strip rectangle to the edit canvas
+	stripWidth = strip.getWidth(); // get teh new width
     $('msn').style.display = "block"; // show the instruction to resize mag strip
+	
+	var mag=document.getElementById("mag"); // get the zoom target IE magnifying class canvas
+    var magctx=mag.getContext("2d"); // get the mag glass context
+    var img=document.getElementById("snapshot"); // get the image id
+    var uc=document.getElementsByClassName("upper-canvas")[0]; // get the upper canvas, where the objects we are drawing exist
+    uc.onmousemove = function zoom(e){ // when we move mouse over the upper canvas
+      console.log(e);
+      magctx.drawImage(img, e.offsetX -25, e.offsetY -25, 50,50, 0, 0, 200, 200 );
+      // Stroked triangle
+      magctx.beginPath();
+      magctx.moveTo(100,50);
+      magctx.lineTo(100,150);
+      magctx.closePath();
+      magctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      magctx.stroke();
+    }
+
+	
   }
 }
 
@@ -118,12 +136,14 @@ document.getElementById('finish').addEventListener('click', showFinished, false)
 function showFinished(){
   $('finished').style.display = "block";
   $('sizes').style.display = "block";
+  $('mag').style.display = "none";
   $('fsi').style.display = "none";
   $('finish').style.display = "none";
   $('fingerMM').style.display = "block";
   $('fingerEU').style.display = "block";
   $('fingerUS').style.display = "block";
   $('reset').style.display = "block";
+  
 }
 
 // Show finger
