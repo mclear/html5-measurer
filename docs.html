@@ -1,0 +1,72 @@
+Usage..
+
+var measure = new measurer();
+
+// All the options
+measure.configure({
+  target: "#cake", // The target container
+  guideImage: "/css/guide.png", // The guide image
+  refObject: { // the item we will use to get a reference size for scale
+    type: "magStrip", // The reference object IE magnetic strip rectangle
+    realWidth: 85.72500, // The real world width in mm (millimeters) overrides type
+    realHeight: 10, // The real world height in mm (millimeters)
+    fabricOpts: { // Fabric options for the reference object
+      width: 200, // The ref object width
+      height: 25, // The ref object height
+      top: 200, // The PX left the object should be drawn
+      right: 200, // The PX left the object should be drawn
+      bottom: 200, // The PX left the object should be drawn
+      left: 200, // The PX left the object should be drawn
+      color: "#fff", // Background color
+      hasBorders: false, // Should the object have borders
+      cornerSize: 5 // The draggable corner size
+    }
+  },
+  targetObject: { // The item we're measuring
+    fabricOpts: {
+      width: 200, // The ref object width
+      height: 25, // The ref object height
+      top: 200, // The PX left the object should be drawn
+      right: 200, // The PX left the object should be drawn
+      bottom: 200, // The PX left the object should be drawn
+      left: 200, // The PX left the object should be drawn
+      color: "#6e6e6e", // Background color
+      hasBorders: false, // Should the object have borders
+      cornerSize: 5, // The draggable corner size
+      lockScalingY: true, // dont allow increase of object size on Y axis
+      angle: 367 // The Axis of the shape as it's drawn on the canvas
+    }
+  },
+  magnify: true, // Should we show magnifying glass?
+  magnifyObj: {
+    width: 200, // The magnifying glass width
+    height: 25, // The magnifying glass  height
+    top: 200, // The PX left the magnifying glass should be drawn
+    right: 200, // The PX left the magnifying glass should be drawn
+    bottom: 200, // The PX left the magnifying glass should be drawn
+    left: 200 // The PX left the magnifying glass should be drawn
+  },
+  countDown: true, // Should we display a countdown?
+  countDuration: 5, // The duration in seconds the countdown will last
+  width: 800, // Width
+  height: 600 // Height
+});
+
+// Events
+measure.start();
+measure.on("refResize", function(args){});
+measure.on("targetResize", function(args){});
+measure.on("targetFinished", function(args){});
+measure.on("countdownFinished", function(args){});
+measure.on("measurementDone", function(args){});
+measure.destroy();
+
+
+// Basic example
+var measure = new measurer({target: "#measure"});
+measure.start(); // Will alert size of object measured when compared against mag strip
+
+// Technical challenges we have.
+
+Making the webcam n canvas' relative size
+
