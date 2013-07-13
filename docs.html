@@ -26,9 +26,9 @@ measure.configure({
     fabricOpts: {
       width: 200, // The ref object width
       height: 25, // The ref object height
-      top: 200, // The PX left the object should be drawn
-      right: 200, // The PX left the object should be drawn
-      bottom: 200, // The PX left the object should be drawn
+      top: 200, // The PX top the object should be drawn
+      right: 200, // The PX right the object should be drawn
+      bottom: 200, // The PX bottom the object should be drawn
       left: 200, // The PX left the object should be drawn
       color: "#6e6e6e", // Background color
       hasBorders: false, // Should the object have borders
@@ -40,10 +40,10 @@ measure.configure({
   magnify: true, // Should we show magnifying glass?
   magnifyObj: {
     width: 200, // The magnifying glass width
-    height: 25, // The magnifying glass  height
-    top: 200, // The PX left the magnifying glass should be drawn
-    right: 200, // The PX left the magnifying glass should be drawn
-    bottom: 200, // The PX left the magnifying glass should be drawn
+    height: 200, // The magnifying glass height
+    top: 200, // The PX top the magnifying glass should be drawn
+    right: 200, // The PX right the magnifying glass should be drawn
+    bottom: 200, // The PX bottom the magnifying glass should be drawn
     left: 200 // The PX left the magnifying glass should be drawn
   },
   countDown: true, // Should we display a countdown?
@@ -63,10 +63,30 @@ measure.destroy();
 
 
 // Basic example
+<html>
+<body>
+<script src="measurer.js"></script>
+<div id="measure"></div>
+<script>
 var measure = new measurer({target: "#measure"});
-measure.start(); // Will alert size of object measured when compared against mag strip
+measure.start();
+</script>
+</body>
+</html>
 
 // Technical challenges we have.
 
-Making the webcam n canvas' relative size
+SOLVED - Making the webcam n canvas' relative size -- http://mclear.co.uk/2013/07/12/getusermedia-screenshot-wrong-size/
+
+Provide browser heuristic for each browsers getUserMedia prompt message
+
+// Examples to provide
+
+Measure Ring Finger
+Measure distance between eyes
+
+// Questions, should we provide a Modal?
+
+// Use this shim https://github.com/addyosmani/getUserMedia.js & we will have flash fallback
+
 
