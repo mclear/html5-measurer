@@ -65,8 +65,13 @@ finger.on('modified', function(options) {
 
 function measure(){
   var ringSize = scaleToRingSize(finger.getWidth()); // gets ring size in mm
+  
+  console.log(ringSize);
+  ringSize = parseFloat(ringSize) + 1.6; // ringSize was the finger size but we need to know the ring size which is ~1.6mm larger than a finger (comfort)
+  console.log("after", ringSize);
   var ringSizeLegacy = new ringSizeFromMM(ringSize); // gets the ring Size in legacy broken industry form IE 9, object returned.
   // console.log("ringSizeLegacy", ringSizeLegacy);
+  ringSize = Math.round(ringSize*100)/100; // Round to two decimal places for presentation
   document.getElementById('fingerMM').innerHTML = ringSize + "mm";
   if(ringSizeLegacy.eu) document.getElementById('fingerEU').innerHTML = ringSizeLegacy.eu + " EU";
   if(ringSizeLegacy.us) document.getElementById('fingerUS').innerHTML = ringSizeLegacy.us + " US";
@@ -95,7 +100,7 @@ function snapshot() {
     var img=document.getElementById("snapshot"); // get the image id
     var uc=document.getElementsByClassName("upper-canvas")[0]; // get the upper canvas, where the objects we are drawing exist
     uc.onmousemove = function zoom(e){ // when we move mouse over the upper canvas
-      console.log(e);
+      
       magctx.drawImage(img, e.offsetX -25, e.offsetY -25, 50,50, 0, 0, 200, 200 );
       // Stroked triangle
       magctx.beginPath();
