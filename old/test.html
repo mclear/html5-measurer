@@ -1,0 +1,23 @@
+<html>
+<body>
+<img src="debugImg.png" id="debugImg">
+<canvas id="myCanvas" height=200 width=200></canvas>
+
+<script type="text/javascript">
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+var img=document.getElementById("debugImg");
+img.onmousemove = function zoom(e){
+  ctx.drawImage(img, e.offsetX -25, e.offsetY -25, 50,50, 0, 0, 200, 200 );
+  // Stroked triangle
+  ctx.beginPath();
+  ctx.moveTo(100,50);
+  ctx.lineTo(100,150);
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.stroke();
+}
+</script>
+
+</body>
+</html>

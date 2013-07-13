@@ -1,37 +1,49 @@
 var $ = function(id){return document.getElementById(id)}; // lazy dev is lazy
-var debug = gup("debug");
 var localMediaStream = null;
 
-if(debug){ // I haven't quite figured out how this will work yet..
-  // write image instead of using video
-  $('prompt').style.display = "none";
-  localMediaStream = true;
-  video = document.getElementById('debugImg');
-  video.src = "debugImg.png";
-  snapshot();
-}else{
-  window.URL = window.URL || window.webkitURL;
-  navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                          navigator.mozGetUserMedia || navigator.msGetUserMedia;
-  var video = document.querySelector('video'); // the video input source
-  // Start Video Stream
-  navigator.getUserMedia({video: true}, function(stream) {
-    video.src = window.URL.createObjectURL(stream);
-    localMediaStream = stream;
-    $('guide').style.display = "block";
-    $('go').style.display = "block";
-    $('prompt').style.display = "none";
-    // Draw shapes onto Canvas
-  }, function(){
-     alert("Enable and Allow your camera");
-  });
-}
-var canvas = new fabric.Canvas('canvas'); // the main canvas element that can be modified by resizing etc.
-var canvas2 = $('canvas2').getContext('2d'); // the canvas element that will contain the video captured
-var stripWidth = 170; // The magnetic strip width
-var count=4; // The countdown duration in seconds -- note the extra second for kids..
-var counter; // The actual timer.
 
+window.URL = window.URL || window.webkitURL;
+navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                          navigator.mozGetUserMedia || navigator.msGetUserMedia;
+						  
+var video = $('video'); // the video input source
+var canvas = new fabric.Canvas('canvas'); // the main canvas element that can be modified by resizing etc.
+var c = $('canvas2');
+var ctx = c.getContext('2d'); // the canvas element that will contain the video captured
+var stripWidth = 170; // The magnetic strip width
+var count=1; // The countdown duration in seconds -- note the extra second for kids..
+var counter; // The actual timer.
+					  
+// Start Video Stream
+navigator.getUserMedia({video: true}, function(stream) {
+  video.src = window.URL.createObjectURL(stream);
+  localMediaStream = stream;
+  $('guide').style.display = "block";
+  $('go').style.display = "block";
+  $('prompt').style.display = "none";
+  setTimeout(function(){
+    resizeObjects();
+  }, 50);
+
+  // Draw shapes onto Canvas
+}, function(){
+   alert("Enable and Allow your camera");
+});
+
+function resizeObjects(){
+  canvas.setWidth(video.offsetWidth);
+  canvas.setHeight(video.offsetHeight);
+  canvas.calcOffset();
+  canvas.renderAll();
+  $('container').style.width = video.offsetWidth + "px"; // make the main container the right size
+}
+
+window.onresize = function(event) {
+  if(localMediaStream){ // if the video exists
+    resizeObjects();
+  }
+};
+  
 // The magnetic strip rectangle.
 var strip = new fabric.Rect({
   width: stripWidth,
@@ -65,8 +77,8 @@ finger.on('modified', function(options) {
 
 function measure(){
   var ringSize = scaleToRingSize(finger.getWidth()); // gets ring size in mm
+  ringSize = ringSize + 1.6; // We know the finger size, well a ring size is basically this but then an additional 1.6mm
   var ringSizeLegacy = new ringSizeFromMM(ringSize); // gets the ring Size in legacy broken industry form IE 9, object returned.
-  // console.log("ringSizeLegacy", ringSizeLegacy);
   document.getElementById('fingerMM').innerHTML = ringSize + "mm";
   if(ringSizeLegacy.eu) document.getElementById('fingerEU').innerHTML = ringSizeLegacy.eu + " EU";
   if(ringSizeLegacy.us) document.getElementById('fingerUS').innerHTML = ringSizeLegacy.us + " US";
@@ -77,17 +89,22 @@ function snapshot() {
   console.log("Grabbing snapshot");
 
   if (localMediaStream) {
-    video.style.display = "none";
+    document.getElementsByClassName("upper-canvas")[0].style.display = "block"; // show the edit canvas
+    c.width = video.offsetWidth; // update the canvas width and height
+    c.height = video.offsetHeight;
+    $('mag').style.display = "block";
+    $('canvas').style.display = "block";
     $('guide').style.display = "none";
     $('go').style.display = "none";
     // $('sizes').style.display = "block";
     $('msi').style.display = "block"; // show the instruction to resize mag strip
-    canvas2.drawImage(video, 0, 0, 800, 600); // draw the captured content onto a canvas
-	var c = $('canvas2'); // get the canvas without context
-    var dataURL = c.toDataURL(); // get the data url of teh canvas
-    $('snapshot').src = dataURL; // write the data url to the image holder
+    ctx.drawImage(video, 0, 0, video.offsetWidth, video.offsetHeight); // draw the captured content onto a canvas
+    $('snapshot').src = c.toDataURL('image/png');
+    // var dataURL = c.toDataURL(); // get the data url of teh canvas
+    // $('snapshot').src = dataURL; // write the data url to the image holder
 	canvas.add(strip); // add the strip rectangle to the edit canvas
 	stripWidth = strip.getWidth(); // get teh new width
+	canvas.calcOffset();
     $('msn').style.display = "block"; // show the instruction to resize mag strip
 	
 	var mag=document.getElementById("mag"); // get the zoom target IE magnifying class canvas
@@ -95,18 +112,16 @@ function snapshot() {
     var img=document.getElementById("snapshot"); // get the image id
     var uc=document.getElementsByClassName("upper-canvas")[0]; // get the upper canvas, where the objects we are drawing exist
     uc.onmousemove = function zoom(e){ // when we move mouse over the upper canvas
-      console.log(e);
       magctx.drawImage(img, e.offsetX -25, e.offsetY -25, 50,50, 0, 0, 200, 200 );
-      // Stroked triangle
       magctx.beginPath();
       magctx.moveTo(100,50);
-      magctx.lineTo(100,150);
+      magctx.lineTo(100,150); // draws the identifier line
       magctx.closePath();
       magctx.strokeStyle = 'rgba(255,255,255,0.3)';
       magctx.stroke();
     }
-
-	
+	localMediaStream.stop(); // stop using webcam
+    video.src=null;
   }
 }
 
