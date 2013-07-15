@@ -29,7 +29,7 @@ if(debug){ // I haven't quite figured out how this will work yet..
 var canvas = new fabric.Canvas('canvas'); // the main canvas element that can be modified by resizing etc.
 var canvas2 = $('canvas2').getContext('2d'); // the canvas element that will contain the video captured
 var stripWidth = 170; // The magnetic strip width
-var count=4; // The countdown duration in seconds -- note the extra second for kids..
+var count=9; // The countdown duration in seconds -- note the extra second for kids..
 var counter; // The actual timer.
 
 // The magnetic strip rectangle.
@@ -59,22 +59,46 @@ strip.on('modified', function(options) {
   stripWidth = strip.getWidth(); // get teh new width
 });
 
+strip.on('scaling', function(e){
+  var y = strip.top +13;
+  magnify(e.e, y); // mag glass
+});
+
 finger.on('modified', function(options) {
   measure();
 });
 
+finger.on('scaling', function(e){
+  var y = e.e.offsetY;
+  magnify(e.e, y); // mag glass
+});
+
 function measure(){
   var ringSize = scaleToRingSize(finger.getWidth()); // gets ring size in mm
-  
   console.log(ringSize);
-  ringSize = parseFloat(ringSize) + 1.6; // ringSize was the finger size but we need to know the ring size which is ~1.6mm larger than a finger (comfort)
-  console.log("after", ringSize);
-  var ringSizeLegacy = new ringSizeFromMM(ringSize); // gets the ring Size in legacy broken industry form IE 9, object returned.
+// var ringSizeInc = ringSize;
+  var ringSizeInc = parseFloat(ringSize) * 1.2; // ringSize was the finger size but we need to know the ring size which is ~20% larger than a finger (comfort)
+  console.log("after", ringSizeInc);
+  var ringSizeLegacy = new ringSizeFromMM(ringSizeInc); // gets the ring Size in legacy broken industry form IE 9, object returned.
   // console.log("ringSizeLegacy", ringSizeLegacy);
-  ringSize = Math.round(ringSize*100)/100; // Round to two decimal places for presentation
-  document.getElementById('fingerMM').innerHTML = ringSize + "mm";
+  var ringSizeRnd = Math.round(ringSizeInc*100)/100; // Round to two decimal places for presentation
+  document.getElementById('fingerMM').innerHTML = ringSizeRnd + "mm";
   if(ringSizeLegacy.eu) document.getElementById('fingerEU').innerHTML = ringSizeLegacy.eu + " EU";
   if(ringSizeLegacy.us) document.getElementById('fingerUS').innerHTML = ringSizeLegacy.us + " US";
+}
+
+function magnify(e, y){
+  var img=document.getElementById("snapshot"); // get the image id
+  var mag=document.getElementById("mag"); // get the zoom target IE magnifying class canvas
+  var magctx=mag.getContext("2d"); // get the mag glass context
+  magctx.drawImage(img, e.offsetX -25, y -25, 50,50, 0, 0, 200, 200 );
+  // Stroked line
+  magctx.beginPath();
+  magctx.moveTo(100,50);
+  magctx.lineTo(100,100);
+  magctx.closePath();
+  magctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  magctx.stroke();
 }
 
 function snapshot() {
@@ -95,31 +119,16 @@ function snapshot() {
 	stripWidth = strip.getWidth(); // get teh new width
     $('msn').style.display = "block"; // show the instruction to resize mag strip
 	
-	var mag=document.getElementById("mag"); // get the zoom target IE magnifying class canvas
-    var magctx=mag.getContext("2d"); // get the mag glass context
-    var img=document.getElementById("snapshot"); // get the image id
-    var uc=document.getElementsByClassName("upper-canvas")[0]; // get the upper canvas, where the objects we are drawing exist
-    uc.onmousemove = function zoom(e){ // when we move mouse over the upper canvas
-      
-      magctx.drawImage(img, e.offsetX -25, e.offsetY -25, 50,50, 0, 0, 200, 200 );
-      // Stroked triangle
-      magctx.beginPath();
-      magctx.moveTo(100,50);
-      magctx.lineTo(100,150);
-      magctx.closePath();
-      magctx.strokeStyle = 'rgba(255,255,255,0.3)';
-      magctx.stroke();
-    }
-
-	
   }
 }
 
 // Takes a scale value and tries to figure out the mm diameter of each ring
 function scaleToRingSize(widthPx){
-  console.log(widthPx, stripWidth);
-  // console.log(widthPx);
-  return (85.72500 / stripWidth * widthPx).toFixed(2);;
+  console.log("widthPx:" + widthPx, "stripWidth:"+stripWidth);
+  var widthInMM = 85.72500 / stripWidth * widthPx;
+  console.log("width in MM", widthInMM);
+  return widthInMM;
+  // return (85.72500 / stripWidth * widthPx).toFixed(2);
 }
 
 function countdown(){

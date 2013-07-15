@@ -10,7 +10,7 @@
 </head>
 
 <body style="margin:0;padding:0;font-family:Arial">
-  <div id="container" style="position:relative;max-width:800px;text-align:center;margin:0;padding:0;">
+  <div id="container" style="position:relative;max-width:800px;text-align:center;margin:0;padding:0;overflow:hidden;">
     <video autoplay width=800 style="position:absolute;top:0;left:0"></video>
     <canvas id="canvas" style="position:absolute;top:0;left:0;z-index:6" width=800 height=600></canvas>
     <canvas id="canvas2" style="position:absolute;top:0;left:0;z-index:1;display:none;" width=800 height=600></canvas>
@@ -21,9 +21,9 @@
     <div id="fsi" style="font-size:40px;position:absolute;top:0;left:10px;display:none;z-index:5;-webkit-text-stroke: 1px black;color: white;text-shadow:3px 3px 0 #000,-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">Put the blue box over the ring finger resizing it to fit</div>
   	<button id="msn" style="font-size:40px;position:absolute;top:530px;right:10px;display:none;z-index:7;" >Next</button>
 	<button id="finish" style="font-size:40px;position:absolute;top:530px;right:10px;display:none;z-index:7;" >Finish</button>
-    <canvas id="mag" style="position:absolute;bottom:0;left:0;z-index:9"></canvas>
-    <div id="guide" style="position:absolute;top:35px;left:0;display:none;z-index:5;width:100%;text-align:center" ><img src="guide.svg"></div>
-	<button id="go" style="z-index:8;position:absolute;top:500px;font-size:80px;display:none;width:100%;">Get started</button>
+    <canvas id="mag" style="position:absolute;bottom:0;left:0;z-index:5"></canvas>
+    <div id="guide" style="position:absolute;top:35px;left:0;display:none;z-index:5;width:100%;text-align:center" ><img style="height:1000px; top:-200px;position:relative;left:25px;" src="guide.svg"></div>
+	<button id="go" style="z-index:8;position:absolute;top:530px;font-size:60px;display:none;width:100%;">Begin 10 Second Countdown</button>
     <div id="prompt" style="text-align:center;font-size:80px;position:absolute;top:50px;width:100%;">Click "Allow" above</div>
 	
 	
